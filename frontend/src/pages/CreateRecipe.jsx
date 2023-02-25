@@ -24,7 +24,7 @@ const CreateRecipe = () => {
     const handleSubmit = async (event) =>{
       event.preventDefault()  
 
-      const res = await fetch(`http://127.0.0.1:8000/recipe`, {
+      const res = await fetch(`https://recipeappbackend.onrender.com/recipe`, {
         method : "POST",
         headers : {
             "Content-type": "application/json",

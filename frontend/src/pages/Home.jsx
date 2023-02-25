@@ -20,7 +20,7 @@ const Home = () => {
   const getContact = async () => {
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/myrecipe`, {
+      const res = await fetch(`https://recipeappbackend.onrender.com/myrecipe`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
