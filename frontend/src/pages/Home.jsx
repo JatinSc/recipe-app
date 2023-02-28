@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthContext from '../context/AuthContext'
+import Modal from 'react-bootstrap/Modal';
 
 
 const Home = () => {
@@ -42,11 +43,15 @@ const Home = () => {
     "directions": "In a large bowl, mix together the milk powder, flour, baking powder, and ghee. Slowly add in the milk, mixing until a dough forms. Knead the dough until smooth, then shape into small balls. In a separate pan, heat the sugar and water until the sugar has dissolved. Add in the rose water, saffron, and cardamom powder and mix well. Drop the dough balls into the syrup and simmer for 10-15 minutes, or until the balls have expanded and the syrup has thickened. Serve warm or at room temperature."
   }
 ])
+const [showModal, setShowModal] = useState(false)
+const [modalData, setModalData] = useState({})
+const [fullscreen, setFullscreen] = useState(true)
+const [show,setShow] = useState(true)
 
   const [searchInput, setSearchInput] = useState("")
   const [expand, setExpand] = useState(false)
   
-  const getContact = async () => {
+  const getRecipe = async () => {
 
     try {
       const res = await fetch(`https://recipeappbackend.onrender.com/myrecipe`, {
@@ -73,14 +78,14 @@ const Home = () => {
   }
 
   useEffect(() => {
-    getContact()
+    getRecipe()
   }, []);
 
   const handleExpand = () => {
-    if(expand){
-      setExpand(false)
+    if(show){
+      setShow(false)
     }else{
-      setExpand(true)
+      setShow(true)
     }
   }
   return (
@@ -107,26 +112,36 @@ const Home = () => {
       <div style={{width:"50%",marginLeft:"26%"}}>{recipe.filter((recipe) =>
         recipe.title.toLowerCase().includes(searchInput.toLowerCase())).map((recipe) => (
           <div className="card mb-3" key={recipe._id}
-            onClick={handleExpand}
+            onClick={ ()=> {setModalData({});
+            setModalData(recipe);
+            setShowModal(true)}}
           >
             <h3 className="card-header">{recipe.title}</h3>
             <div className="card-body">
               <h5 className="card-title">Author : {recipe.author}</h5>
             </div>
-            <img src={recipe.image} alt="food image" style={{ width: "100%", height: "60%" }}></img>
-            <div className="card-body">
-            {expand?<>
-            <button className='btn btn-dark my-2' style={{margin:"5px"}}>ingredients</button>
-            <button className='btn btn-dark my-2'>directions</button>
-            <p className="card-text"><b>Ingredients are :</b> {recipe.ingredients}</p>
-            </> : <><button className='btn btn-dark my-2' style={{margin:"5px"}}>ingredients</button>
-            <button className='btn btn-dark my-2'>directions</button>
-            <p className="card-text"><b>directions are :</b> {recipe.directions}</p></>}  
-            </div>
+            <img src={recipe.image} alt="food image" style={{ width: "100%", height: "60%"}}></img>
           </div>
         ))}
       </div>
     </div>
+    <Modal show={showModal} fullscreen={fullscreen} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{modalData.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{display:"flex"}}>
+        author : {modalData.author}
+          <div style={{width:"50%",borderRight:"5px solid grey",height:"100%",left:"50%",}}>
+          <img  style={{width:"50%",left:"50%",}} src={modalData.image}></img>
+         
+          </div>
+          <div style={{right:"100%",width:"50%"}}>
+            <button className='btn btn-dark my-2' style={{margin:"5px",marginLeft:"35%"}} disabled={show} onClick={handleExpand}>Ingredients</button>
+            <button className='btn btn-dark my-2' disabled={!show} onClick={handleExpand}>Directions</button>
+            {show?<p>{modalData.ingredients}</p>:<p>{modalData.directions}</p>}
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   )
 }
